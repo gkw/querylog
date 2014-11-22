@@ -1,2 +1,33 @@
-querylog
+Assumptions
+
+[Application Version]
+  python 2.7
+  mongodb 2.0.4 installed on the same machine with no password configured.
+  
+[Log Format]
+  IP address, and time
+  IP address are stored as 4 hex digits charcters rather than 4 integers to save memory/storage space.
+  
+[Results]
+
+  For example,
+  
+  Output will be:
+
+  [date]              [ip address]
+  2014-03-31 21:42:59 64.12.32.153
+  2014-03-31 23:08:37 197.9.152.63
+  2014-03-31 23:21:58 236.78.63.23
+  1432 hits (1405 unique hits)
+
+  "1432 hits" means number of log that found in the log within specificed time frame
+  "1405 unique hits" shows the number after removing redundant IP address whithin a day.
+
+[Scalability]
+
+  Scalable by having mongodb clustered. It is easily expandable having multiple mondodbs. 
+  
+[Limitation]
+   mongodb can store data up to 64 TB.
+
 
