@@ -45,7 +45,7 @@ def query(params):
       ipv4s.add("".join(x['ipv4']))
 
       print ("%s %s") % (visited_at, d2ip(x['ipv4']))
-    print ("%d hits (%d unique hits)" % (results.count(), ip_count))
+    print ("%d hits (%d unique hits)" % (results.count(),  ip_count+len(ipv4s)))
   except Exception as ex01:
     print ex01
 
