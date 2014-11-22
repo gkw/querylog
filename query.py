@@ -19,16 +19,35 @@ def query(params):
   
   results = db.find({'visited_at':{'$gt':params['from']},
                      'visited_at':{'$lt':params['to']}},
-                    {'_id':0,'ipv4':1,'visited_at':1,'url':1}).sort('visited_at', 1)
+                    {'_id':0,'ipv4':1,'visited_at':1}).sort('visited_at', 1)
 
   #make sure index is being used...
   #pprint(db.find({'visited_at':{'$gt':params['from']},
   #                'visited_at':{'$lt':params['to']}}}.explain()
 
-  for x in results:
-    visited_at = x['visited_at']
-    print ("%s %s %s") % (visited_at, d2ip(x['ipv4']), x['url'])
-  print ("%d hits" % results.count())
+  try:
+    last_date = None
+    ipv4s = set([])
+    ip_count = 0
+
+    for x in results:
+      visited_at = x['visited_at']
+      
+      #reset ipv4s for new day
+      if last_date != None:
+        if last_date.year  != visited_at.year or   \
+           last_date.month != visited_at.month or \
+           last_date.day   != visited_at.day:
+          #print ipv4s
+          ip_count = ip_count + len(ipv4s)
+          ipv4s = set([])
+      last_date = visited_at
+      ipv4s.add("".join(x['ipv4']))
+
+      print ("%s %s") % (visited_at, d2ip(x['ipv4']))
+    print ("%d hits (%d unique hits)" % (results.count(), ip_count))
+  except Exception as ex01:
+    print ex01
 
 def random_date(start, end):
     """
@@ -72,7 +91,8 @@ def init(count):
 
     log = {'ipv4':num2hex(ipaddr),
            'visited_at': random_date(d1, d2),
-           'url': 'http://example.org/products/' + str(randrange(count)) + '.html'}
+          #'url': 'http://example.org/products/' + str(randrange(count)) + '.html'
+          }
     db.insert(log)
 
   #create indexes
@@ -83,7 +103,7 @@ def init(count):
 
 if __name__ == "__main__":
   try:
-    init(1000)
+    init(5000)
   except:
     print "cannot be initialized..."
     quit()
