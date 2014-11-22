@@ -6,7 +6,7 @@ Assumptions
   
 [Log Format]
   IP address, and time
-  IP address are stored as 4 hex digits charcters rather than 4 integers to save memory/storage space.
+  IP address are stored as 8 hex digits charcters rather than 4 integers to save memory/storage space.
   
 [Results]
 
