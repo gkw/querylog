@@ -94,6 +94,13 @@ def init(count):
           #'url': 'http://example.org/products/' + str(randrange(count)) + '.html'
           }
     db.insert(log)
+    
+    #intentinally making some duplicate IP addresses.
+    log = {'ipv4':num2hex(ipaddr),
+           'visited_at': random_date(d1, d2),
+          #'url': 'http://example.org/products/' + str(randrange(count)) + '.html'
+          }
+    db.insert(log)
 
   #create indexes
   db.ensure_index('visited_at', 1)
