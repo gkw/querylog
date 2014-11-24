@@ -8,6 +8,32 @@ from random import randrange
 from datetime import timedelta
 import pymongo
 
+
+class IPv4:
+  def __init__(self):
+    self.digits = [0,0,0,0]
+
+  def set(self, d):
+    self.digits = d
+
+  def hexpad(self, num):
+    h = str(hex(num))[2:6]
+    if len(h) == 1:
+      return "0" + h
+    else:
+      return h
+
+  def num2hex(self):
+    d = self.digits
+    return [self.hexpad(d[0]),self.hexpad(d[1]),self.hexpad(d[2]),self.hexpad(d[3])]
+
+  @staticmethod
+  def char2ip(d):
+    return str(int(d[0],16)) + "." + \
+           str(int(d[1],16)) + "." + \
+           str(int(d[2],16)) + "." + \
+           str(int(d[3],16))
+  
 #python2.7 is used to run this script
 
 def query(params):
@@ -44,7 +70,7 @@ def query(params):
       last_date = visited_at
       ipv4s.add("".join(x['ipv4']))
 
-      print ("%s %s") % (visited_at, d2ip(x['ipv4']))
+      print ("%s %s") % (visited_at, IPv4.char2ip(x['ipv4']))
     print ("%d hits (%d unique hits)" % (results.count(),  ip_count+len(ipv4s)))
   except Exception as ex01:
     print ex01
@@ -59,44 +85,31 @@ def random_date(start, end):
 
     return start + timedelta(seconds=random_second)
 
-def hexpad(num):
-  h = str(hex(num))[2:6]
-  if len(h) == 1:
-    return "0" + h
-  else:
-    return h
-
-def num2hex(d):
-  return [hexpad(d[0]),hexpad(d[1]),hexpad(d[2]),hexpad(d[3])]
-
-def d2ip(d):
-  return str(int(d[0],16)) + "." + \
-         str(int(d[1],16)) + "." + \
-         str(int(d[2],16)) + "." + \
-         str(int(d[3],16))
-
 def init(count):
 
   conn = pymongo.MongoClient()
   db = conn.endgame.conding_GenkiKuroda.drop()
   db = conn.endgame.conding_GenkiKuroda
 
-  ipaddr = [0,0,0,0]
+  ipaddr = IPv4()
   for x in xrange(count):
     for i in range(4):
-      ipaddr[i] = random.randint(0, 255)
+      try:
+        ipaddr.digits[i] = random.randint(0, 255)
+      except Exception as ex01:
+        print ex01
 
     d1 = datetime.strptime('1/1/2014  1:30 PM', '%m/%d/%Y %I:%M %p')
     d2 = datetime.strptime('11/1/2014 3:50 PM', '%m/%d/%Y %I:%M %p')
 
-    log = {'ipv4':num2hex(ipaddr),
+    log = {'ipv4':ipaddr.num2hex(),
            'visited_at': random_date(d1, d2),
           #'url': 'http://example.org/products/' + str(randrange(count)) + '.html'
           }
     db.insert(log)
     
     #intentinally making some duplicate IP addresses.
-    log = {'ipv4':num2hex(ipaddr),
+    log = {'ipv4':ipaddr.num2hex(),
            'visited_at': random_date(d1, d2),
           #'url': 'http://example.org/products/' + str(randrange(count)) + '.html'
           }
@@ -111,8 +124,8 @@ def init(count):
 if __name__ == "__main__":
   try:
     init(5000)
-  except:
-    print "cannot be initialized..."
+  except Exception as ex01:
+    print ex01, "cannot be initialized..."
     quit()
 
   try:
